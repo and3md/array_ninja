@@ -40,7 +40,7 @@ layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), result: Result) 
 	}
 	layer, bad_aloc := new(ArrayLayer(T))
 	if bad_aloc != nil {
-		return nil, {.AllocationError, "Array layer must be a union"}
+		return nil, {.AllocationError, "Can't allocate an array layer."}
 	}
 	new_layer = layer
 	defer if result.code != .Success {
