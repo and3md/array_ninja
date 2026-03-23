@@ -1,0 +1,5 @@
+package arrayninja
+
+Engine :: struct {
+    
+}
