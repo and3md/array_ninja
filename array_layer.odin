@@ -20,7 +20,7 @@ ChildLevel :: distinct u8
 
 ArrayTransform :: struct {
 	x, y:        f32,
-	scale:		 f32,
+	scale:       f32,
 	rotation:    f32,
 	id:          PersistentId,
 	child_level: ChildLevel,
@@ -60,11 +60,10 @@ layer_free :: proc(layer: ^ArrayLayer($T)) {
 
 layer_render :: proc(layer: ^ArrayLayer($T)) {
 	for &element in layer.arr {
-
 		if reflect.union_variant_typeid(element) == typeid_of(Square) {
 			fmt.println("Square")
-			square := element.(Square);
-			rect_draw(Rect{0,0, square.w, square.h}, square.color)
+			square := element.(Square)
+			rect_draw(Rect{0, 0, square.w, square.h}, square.color)
 		}
 		if reflect.union_variant_typeid(element) == typeid_of(ArrayTransform) {
 			fmt.println("ArrayTransform1")
