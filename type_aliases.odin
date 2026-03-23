@@ -9,3 +9,4 @@ Texture :: k2.Texture
 Font :: k2.Font
 
 Vec2 :: k2.Vec2
+Rect :: k2.Rect
