@@ -24,6 +24,7 @@ ArrayTransform :: struct {
 	x, y:        f32,
 	scale:       f32,
 	rotation:    f32, // in degrees
+	origin:      Vec2,
 	id:          PersistentId,
 	child_level: ChildLevel,
 }
@@ -69,19 +70,33 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 	for &element in layer.arr {
 		if reflect.union_variant_typeid(element) == typeid_of(Square) {
 			square := element.(Square)
-			rect_draw(Rect{0, 0, square.w, square.h}, square.color)
+			x := world_matrix[2, 0]
+			y := world_matrix[2, 1]
+
+			angle := math.atan2(world_matrix[0, 1], world_matrix[0, 0])
+
+			scale_x := linalg.length(linalg.Vector2f32{world_matrix[0, 0], world_matrix[0, 1]})
+			scale_y := linalg.length(linalg.Vector2f32{world_matrix[1, 0], world_matrix[1, 1]})
+
+			fmt.printfln("%f %f - %f rad, scale: %f %f", x, y, angle, scale_x, scale_y)
+
+			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
 		}
 		if reflect.union_variant_typeid(element) == typeid_of(ArrayTransform) {
 			transform := element.(ArrayTransform)
 			m := linalg.Matrix3f32(1.0)
-			m[2, 0] = transform.x
-			m[2, 1] = transform.y
+			// added origin
+			m[2, 0] -= transform.origin.x
+			m[2, 1] -= transform.origin.y
 
 			// {0,0,1} is axis of rotation
 			m =
 				m *
-				linalg.matrix3_rotate_f32(linalg.to_radians(transform.rotation), {0, 0, 1}) *
-				linalg.matrix3_scale_f32({1.0, 1.0, 1.0})
+				linalg.matrix3_scale_f32({transform.scale, transform.scale, 1.0}) *
+				linalg.matrix3_rotate_f32(linalg.to_radians(transform.rotation), {0, 0, 1})
+
+			m[2, 0] += transform.x
+			m[2, 1] += transform.y
 
 			world_matrix = world_matrix * m
 		}
