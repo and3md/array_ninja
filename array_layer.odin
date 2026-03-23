@@ -27,7 +27,8 @@ ArrayTransform :: struct {
 }
 
 Square :: struct {
-	W, H:        int,
+	w, h:        f32,
+	color:       Color,
 	id:          PersistentId,
 	child_level: ChildLevel,
 }
@@ -62,6 +63,8 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 
 		if reflect.union_variant_typeid(element) == typeid_of(Square) {
 			fmt.println("Square")
+			square := element.(Square);
+			rect_draw(Rect{0,0, square.w, square.h}, square.color)
 		}
 		if reflect.union_variant_typeid(element) == typeid_of(ArrayTransform) {
 			fmt.println("ArrayTransform1")
