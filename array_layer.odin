@@ -75,7 +75,7 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 			transform := element.(ArrayTransform)
 			m := linalg.Matrix3f32(1.0)
 			m[2, 0] = transform.x
-			m[2, 0] = transform.y
+			m[2, 1] = transform.y
 
 			// {0,0,1} is axis of rotation
 			m =
