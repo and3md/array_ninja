@@ -2,6 +2,8 @@ package array_ninja
 
 import "base:intrinsics"
 import "core:fmt"
+import "core:math"
+import "core:math/linalg"
 import "core:reflect"
 
 LAYER_DEFAULT_CAPACITY :: 1000
@@ -21,7 +23,7 @@ ChildLevel :: distinct u8
 ArrayTransform :: struct {
 	x, y:        f32,
 	scale:       f32,
-	rotation:    f32,
+	rotation:    f32, // in degrees
 	id:          PersistentId,
 	child_level: ChildLevel,
 }
@@ -59,14 +61,29 @@ layer_free :: proc(layer: ^ArrayLayer($T)) {
 }
 
 layer_render :: proc(layer: ^ArrayLayer($T)) {
+	// Identity Matrix in Odin = Matrix3f32(1.0)
+	world_matrix := linalg.Matrix3f32(1.0)
+	fmt.printfln("%#v", world_matrix)
+	m: linalg.Matrix3f32
+
 	for &element in layer.arr {
 		if reflect.union_variant_typeid(element) == typeid_of(Square) {
-			fmt.println("Square")
 			square := element.(Square)
 			rect_draw(Rect{0, 0, square.w, square.h}, square.color)
 		}
 		if reflect.union_variant_typeid(element) == typeid_of(ArrayTransform) {
-			fmt.println("ArrayTransform1")
+			transform := element.(ArrayTransform)
+			m := linalg.Matrix3f32(1.0)
+			m[2, 0] = transform.x
+			m[2, 0] = transform.y
+
+			// {0,0,1} is axis of rotation
+			m =
+				m *
+				linalg.matrix3_rotate_f32(linalg.to_radians(transform.rotation), {0, 0, 1}) *
+				linalg.matrix3_scale_f32({1.0, 1.0, 1.0})
+
+			world_matrix = world_matrix * m
 		}
 	}
 }
