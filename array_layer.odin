@@ -19,7 +19,9 @@ PersistentId :: distinct u32
 ChildLevel :: distinct u8
 
 ArrayTransform :: struct {
-	x, y:        int,
+	x, y:        f32,
+	scale:		 f32,
+	rotation:    f32,
 	id:          PersistentId,
 	child_level: ChildLevel,
 }
