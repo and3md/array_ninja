@@ -24,6 +24,12 @@ ArrayTransform :: struct {
 	child_level: ChildLevel,
 }
 
+Square :: struct {
+	W, H:        int,
+	id:          PersistentId,
+	child_level: ChildLevel,
+}
+
 layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), result: Result) {
 	result = check_layer_union_type(T)
 	if result.code != .Success {
@@ -50,10 +56,13 @@ layer_free :: proc(layer: ^ArrayLayer($T)) {
 }
 
 layer_render :: proc(layer: ^ArrayLayer($T)) {
-	for &e in layer.arr {
-		#partial switch (e) {
-		case ArrayTransform:
-			fmt.println("ArrayTransform")
+	for &element in layer.arr {
+
+		if reflect.union_variant_typeid(element) == typeid_of(Square) {
+			fmt.println("Square")
+		}
+		if reflect.union_variant_typeid(element) == typeid_of(ArrayTransform) {
+			fmt.println("ArrayTransform1")
 		}
 	}
 }
