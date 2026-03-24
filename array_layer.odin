@@ -23,7 +23,7 @@ ArrayElement :: struct($T: typeid) {
 	data_union:  T,
 	id:          PersistentId,
 	child_level: ChildLevel,
-	state: ArrayElementState,
+	state:       ArrayElementState,
 }
 
 /*
