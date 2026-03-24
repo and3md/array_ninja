@@ -39,6 +39,9 @@ Square :: struct {
 }
 
 layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), err: Error) {
+	if !intrinsics.type_is_union(T) {
+		return nil, MyError.Array_Layer_Data_Type_Must_Be_Union
+	}
 	layer := new(ArrayLayer(T)) or_return
 	new_layer = layer
 	defer if err != nil {
