@@ -8,6 +8,11 @@ import "core:reflect"
 
 LAYER_DEFAULT_CAPACITY :: 1000
 
+/*
+	Visible also exists,
+	Invisible can exists (update will be called)
+	Invisible non exists (update will not be called)
+*/
 ArrayElementState :: enum byte {
 	Visible,
 	Invisible_Existing,
