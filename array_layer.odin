@@ -167,6 +167,35 @@ layer_delete_element :: proc(layer: ^ArrayLayer($T), id: PersistentId) {
 }
 
 /*
+Detach element with children
+*/
+layer_detach_element :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> [dynamic]ArrayElement(T) {
+
+}
+
+/*
+Gets all parents of element
+*/
+layer_get_parents :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> [dynamic]ArrayElement(PersistentId) {
+
+}
+
+/*
+
+*/
+layers_element_visible :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> bool {
+
+}
+
+/*
+
+*/
+layers_element_exists :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> bool {
+
+}
+
+
+/*
 Returns last child index of element with given index
 */
 layer_last_child_index :: proc(layer: ^ArrayLayer($T), index: int) -> int {
