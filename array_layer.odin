@@ -128,6 +128,24 @@ layer_add_child_element :: proc(
 	return layer_add_element(layer, element, child_level)
 }
 
+layer_add_ancestor_element :: proc(
+	layer: ^ArrayLayer($T),
+	element: T,
+) -> (
+	id: PersistentId,
+	err: Error,
+) {
+	ancestor_level: ChildLevel
+	arr_len := len(layer.arr)
+	if arr_len == 0 {
+		ancestor_level = 0
+	} else {
+		prev_element := layer.arr[arr_len - 1]
+		ancestor_level = math.max(prev_element.child_level - 1, 0)
+	}
+	return layer_add_element(layer, element, ancestor_level)
+}
+
 /*
 Gets element by index.
 Be careful, the returned pointer may change, in the future do not save it for later usage
