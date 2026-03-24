@@ -79,6 +79,15 @@ Gets element by index.
 Be careful, the returned pointer may change, in the future do not save it for later usage
 Only made changes and forget about it. 
 */
+layer_get_element_by_id :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> ^ArrayElement(T) {
+	return &layer.arr[layer.persistent_ids[id]]
+}
+
+/*
+Gets element by index.
+Be careful, the returned pointer may change, in the future do not save it for later usage
+Only made changes and forget about it. 
+*/
 layer_get_element_by_index :: proc(layer: ^ArrayLayer($T), index: int) -> ^ArrayElement(T) {
 	return &layer.arr[index]
 }
