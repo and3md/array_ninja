@@ -147,6 +147,51 @@ layer_add_ancestor_element :: proc(
 }
 
 /*
+Delete element with children
+*/
+layer_delete_element :: proc(layer: ^ArrayLayer($T), id: PersistentId) {
+	index := layer.persistent_ids[id]
+	last_index := layer_last_child_index(layer, index)
+
+	for i in 0..= last_index - index {
+		ordered_remove(&layer.arr, index)
+	}
+	
+	if len(layer.arr) > index {
+		// update persistent id's
+		for i in index ..< len(layer.arr) {
+			element := &layer.arr[i]
+			layer.persistent_ids[element.id] = i
+		}
+	}
+}
+
+/*
+Returns last child index of element with given index
+*/
+layer_last_child_index :: proc(layer: ^ArrayLayer($T), index: int) -> int {
+	parent := layer_get_element_by_index(layer, index)
+	parent_child_level := parent.child_level
+	last_child_index := index
+
+	i := index + 1
+	for i < len(layer.arr) {
+		element := &layer.arr[i]
+		if element.child_level <= parent_child_level {
+			break
+		} else {
+			last_child_index = i
+		}
+		i += 1
+	}
+	return last_child_index
+}
+
+layer_get_current_index_from_id ::proc(layer: ^ArrayLayer($T), id:PersistentId) -> int {
+	return layer.persistent_ids[id]
+}
+
+/*
 Gets element by index.
 Be careful, the returned pointer may change, in the future do not save it for later usage
 Only made changes and forget about it. 
