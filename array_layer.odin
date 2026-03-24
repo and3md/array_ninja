@@ -114,7 +114,7 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 			scale_x := linalg.length(linalg.Vector2f32{world_matrix[0, 0], world_matrix[0, 1]})
 			scale_y := linalg.length(linalg.Vector2f32{world_matrix[1, 0], world_matrix[1, 1]})
 
-			fmt.printfln("%f %f - %f rad, scale: %f %f", x, y, angle, scale_x, scale_y)
+			//fmt.printfln("%f %f - %f rad, scale: %f %f", x, y, angle, scale_x, scale_y)
 
 			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
 		}
