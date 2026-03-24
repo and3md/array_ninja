@@ -58,8 +58,8 @@ layer_free :: proc(layer: ^ArrayLayer($T)) {
 	free(layer)
 }
 
-layer_add_element :: proc(layer: ^ArrayLayer($T), element: T) -> (id: PersistentId) {
 	index, alloc_error := append(
+layer_add_element :: proc(layer: ^ArrayLayer($T), element: T, child_level : ChildLevel = 0) -> (id: PersistentId) {
 		&layer.arr,
 		ArrayElement(T){id = 2, child_level = 1, data_union = element},
 	)
@@ -69,6 +69,7 @@ layer_add_element :: proc(layer: ^ArrayLayer($T), element: T) -> (id: Persistent
 
 	id = cast(PersistentId)append(&layer.persistent_ids, index)
 	element := layer_get_element_by_index(layer, index)
+	element.child_level = child_level
 	element.id = id
 	return id
 }
