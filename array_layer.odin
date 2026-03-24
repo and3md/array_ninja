@@ -100,7 +100,24 @@ layer_add_sibling_element :: proc(
 	return layer_add_element(layer, element, child_level)
 }
 
+layer_add_child_element :: proc(
+	layer: ^ArrayLayer($T),
+	element: T,
+) -> (
+	id: PersistentId,
+	err: Error,
+) {
+	child_level: ChildLevel
+	arr_len := len(layer.arr)
+	if arr_len == 0 {
+		child_level = 0
+	} else {
+		prev_element := layer.arr[arr_len - 1]
+		child_level = prev_element.child_level + 1
+	}
 
+	return layer_add_element(layer, element, child_level)
+}
 
 /*
 Gets element by index.
