@@ -81,6 +81,27 @@ layer_add_element :: proc(
 	return id, nil
 }
 
+layer_add_sibling_element :: proc(
+	layer: ^ArrayLayer($T),
+	element: T,
+) -> (
+	id: PersistentId,
+	err: Error,
+) {
+	child_level: ChildLevel
+	arr_len := len(layer.arr)
+	if arr_len == 0 {
+		child_level = 0
+	} else {
+		prev_element := layer.arr[arr_len - 1]
+		child_level = prev_element.child_level
+	}
+
+	return layer_add_element(layer, element, child_level)
+}
+
+
+
 /*
 Gets element by index.
 Be careful, the returned pointer may change, in the future do not save it for later usage
