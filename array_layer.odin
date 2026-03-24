@@ -8,10 +8,17 @@ import "core:reflect"
 
 LAYER_DEFAULT_CAPACITY :: 1000
 
+ArrayElementState :: enum byte {
+	Visible,
+	Invisible_Existing,
+	Invisible_Nonexisting,
+}
+
 ArrayElement :: struct($T: typeid) {
 	id:          PersistentId,
 	child_level: ChildLevel,
 	data_union:  T,
+	state: ArrayElementState,
 }
 
 /*
