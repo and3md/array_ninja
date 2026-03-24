@@ -59,8 +59,28 @@ layer_free :: proc(layer: ^ArrayLayer($T)) {
 	free(layer)
 }
 
-layer_add_element :: proc(layer: ^ArrayLayer($T), element: T) {
-	append(&layer.arr, ArrayElement(T){id = 2, child_level = 1, data_union = element})
+layer_add_element :: proc(layer: ^ArrayLayer($T), element: T) -> (id: PersistentId) {
+	index, alloc_error := append(
+		&layer.arr,
+		ArrayElement(T){id = 2, child_level = 1, data_union = element},
+	)
+	if alloc_error != nil {
+		return 0
+	}
+
+	id = cast(PersistentId)append(&layer.persistent_ids, index)
+	element := layer_get_element_by_index(layer, index)
+	element.id = id
+	return id
+}
+
+/*
+Gets element by index.
+Be careful, the returned pointer may change, in the future do not save it for later usage
+Only made changes and forget about it. 
+*/
+layer_get_element_by_index :: proc(layer: ^ArrayLayer($T), index: int) -> ^ArrayElement(T) {
+	return &layer.arr[index]
 }
 
 layer_render :: proc(layer: ^ArrayLayer($T)) {
