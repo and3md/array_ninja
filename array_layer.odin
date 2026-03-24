@@ -8,12 +8,18 @@ import "core:reflect"
 
 LAYER_DEFAULT_CAPACITY :: 1000
 
+ArrayElement :: struct($T: typeid) {
+	id:          PersistentId,
+	child_level: ChildLevel,
+	data_union:  T,
+}
+
 /*
 Array layer is a "flat union hierachy" based on child_level as child flag
 
 */
 ArrayLayer :: struct($T: typeid) {
-	arr:            [dynamic]T,
+	arr:            [dynamic]ArrayElement(T),
 	persistent_ids: [dynamic]int,
 }
 
@@ -21,26 +27,18 @@ PersistentId :: distinct u32
 ChildLevel :: distinct u8
 
 ArrayTransform :: struct {
-	x, y:        f32,
-	scale:       f32,
-	rotation:    f32, // in degrees
-	origin:      Vec2,
-	id:          PersistentId,
-	child_level: ChildLevel,
+	x, y:     f32,
+	scale:    f32,
+	rotation: f32, // in degrees
+	origin:   Vec2,
 }
 
 Square :: struct {
-	w, h:        f32,
-	color:       Color,
-	id:          PersistentId,
-	child_level: ChildLevel,
+	w, h:  f32,
+	color: Color,
 }
 
 layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), result: Result) {
-	result = check_layer_union_type(T)
-	if result.code != .Success {
-		return nil, result
-	}
 	layer, bad_aloc := new(ArrayLayer(T))
 	if bad_aloc != nil {
 		return nil, {.AllocationError, "Can't allocate an array layer."}
@@ -61,15 +59,24 @@ layer_free :: proc(layer: ^ArrayLayer($T)) {
 	free(layer)
 }
 
+layer_add_element :: proc(layer: ^ArrayLayer($T), element: T) {
+	append(&layer.arr, ArrayElement(T){id = 2, child_level = 1, data_union = element})
+}
+
 layer_render :: proc(layer: ^ArrayLayer($T)) {
+	//child_level_matrix := make([dynamic]linalg.Matrix3f32)
 	// Identity Matrix in Odin = Matrix3f32(1.0)
+	//append(&child_level_matrix, linalg.Matrix3f32(1.0))
 	world_matrix := linalg.Matrix3f32(1.0)
-	fmt.printfln("%#v", world_matrix)
-	m: linalg.Matrix3f32
+	last_child_level: ChildLevel = 0
 
 	for &element in layer.arr {
-		if reflect.union_variant_typeid(element) == typeid_of(Square) {
-			square := element.(Square)
+		if element.child_level != last_child_level {
+			last_child_level = element.child_level
+		}
+
+		if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
+			square := element.data_union.(Square)
 			x := world_matrix[2, 0]
 			y := world_matrix[2, 1]
 
@@ -82,8 +89,8 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 
 			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
 		}
-		if reflect.union_variant_typeid(element) == typeid_of(ArrayTransform) {
-			transform := element.(ArrayTransform)
+		if reflect.union_variant_typeid(element.data_union) == typeid_of(ArrayTransform) {
+			transform := element.data_union.(ArrayTransform)
 			m := linalg.Matrix3f32(1.0)
 			// added origin
 			m[2, 0] -= transform.origin.x
