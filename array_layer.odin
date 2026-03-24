@@ -15,9 +15,9 @@ ArrayElementState :: enum byte {
 }
 
 ArrayElement :: struct($T: typeid) {
+	data_union:  T,
 	id:          PersistentId,
 	child_level: ChildLevel,
-	data_union:  T,
 	state: ArrayElementState,
 }
 
