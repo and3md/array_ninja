@@ -153,13 +153,20 @@ layer_delete_element :: proc(layer: ^ArrayLayer($T), id: PersistentId) {
 	index := layer.persistent_ids[id]
 	last_index := layer_last_child_index(layer, index)
 
-	for i in 0 ..= last_index - index {
-		ordered_remove(&layer.arr, index)
+	layer_delete_elements_range_by_indexes(layer, index, last_index)
+}
+
+layer_delete_elements_range_by_indexes :: proc(
+	layer: ^ArrayLayer($T),
+	start_index, end_index: int,
+) {
+	for i in 0 ..= end_index - start_index {
+		ordered_remove(&layer.arr, start_index)
 	}
 
-	if len(layer.arr) > index {
+	if len(layer.arr) > start_index {
 		// update persistent id's
-		for i in index ..< len(layer.arr) {
+		for i in start_index ..< len(layer.arr) {
 			element := &layer.arr[i]
 			layer.persistent_ids[element.id] = i
 		}
