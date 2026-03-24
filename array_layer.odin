@@ -73,7 +73,7 @@ layer_add_element :: proc(
 
 	id_len := append(&layer.persistent_ids, arr_len - 1) or_return
 	id = cast(PersistentId)id_len - 1
-	element := layer_get_element_by_index(layer, arr_len)
+	element := layer_get_element_by_index(layer, arr_len -1)
 	element.child_level = child_level
 	element.id = id
 	return id, nil
