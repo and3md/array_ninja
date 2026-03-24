@@ -52,7 +52,6 @@ layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), result: Result) 
 	return new_layer, result
 }
 
-
 layer_free :: proc(layer: ^ArrayLayer($T)) {
 	delete(layer.arr)
 	delete(layer.persistent_ids)
