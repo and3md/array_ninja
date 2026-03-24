@@ -66,16 +66,18 @@ layer_add_element :: proc(
 	id: PersistentId,
 	err: Error,
 ) {
-	arr_len := append(
+	append(
 		&layer.arr,
 		ArrayElement(T){id = 2, child_level = 1, data_union = element},
 	) or_return
+	arr_index := len(layer.arr) - 1
 
-	id_len := append(&layer.persistent_ids, arr_len - 1) or_return
-	id = cast(PersistentId)id_len - 1
-	element := layer_get_element_by_index(layer, arr_len -1)
+	append(&layer.persistent_ids, arr_index) or_return
+	id = cast(PersistentId)len(layer.persistent_ids) - 1
+	element := layer_get_element_by_index(layer, arr_index)
 	element.child_level = child_level
 	element.id = id
+	fmt.printfln("id: %d, value : %v",id, element)
 	return id, nil
 }
 
