@@ -38,18 +38,15 @@ Square :: struct {
 	color: Color,
 }
 
-layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), result: Result) {
-	layer, bad_aloc := new(ArrayLayer(T))
-	if bad_aloc != nil {
-		return nil, {.AllocationError, "Can't allocate an array layer."}
-	}
+layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), err: Error) {
+	layer := new(ArrayLayer(T)) or_return
 	new_layer = layer
-	defer if result.code != .Success {
+	defer if err != nil {
 		free(new_layer)
 		new_layer = nil
 	}
 
-	return new_layer, result
+	return new_layer, nil
 }
 
 layer_free :: proc(layer: ^ArrayLayer($T)) {
