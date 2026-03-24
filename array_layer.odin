@@ -67,8 +67,8 @@ layer_add_element :: proc(layer: ^ArrayLayer($T), element: T, child_level : Chil
 		return 0
 	}
 
-	id, alloc_error = cast(PersistentId)append(&layer.persistent_ids, new_length -1) - 1
-	element := layer_get_element_by_index(layer, index)
+	id = cast(PersistentId)append(&layer.persistent_ids, new_length -1) - 1
+	element := layer_get_element_by_index(layer, new_length -1)
 	element.child_level = child_level
 	element.id = id
 	return id
