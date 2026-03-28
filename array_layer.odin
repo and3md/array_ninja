@@ -373,6 +373,7 @@ layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 			element.child_matrix = child_level_matrix[element.child_level]
 		}
 	}
+	layer.state = .Clean
 }
 
 layer_render :: proc(layer: ^ArrayLayer($T)) {
