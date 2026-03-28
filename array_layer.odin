@@ -362,20 +362,24 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 
 		if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
 			square := element.data_union.(Square)
-			world_matrix:= &child_level_matrix[element.child_level]
-			x := world_matrix[2, 0]
-			y := world_matrix[2, 1]
-
-			angle := math.atan2(world_matrix[0, 1], world_matrix[0, 0])
-
-			scale_x := linalg.length(linalg.Vector2f32{world_matrix[0, 0], world_matrix[0, 1]})
-			scale_y := linalg.length(linalg.Vector2f32{world_matrix[1, 0], world_matrix[1, 1]})
-
-			//fmt.printfln("%f %f - %f rad, scale: %f %f", x, y, angle, scale_x, scale_y)
-
+			x, y, angle, scale_x, scale_y := decompose_matrix(
+				&child_level_matrix[element.child_level],
+			)
 			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
 		}
 	}
+}
+
+decompose_matrix :: proc(mat: ^linalg.Matrix3f32) -> (x, y, angle, scale_x, scale_y: f32) {
+	x = mat[2, 0]
+	y = mat[2, 1]
+
+	angle = math.atan2(mat[0, 1], mat[0, 0])
+
+	scale_x = linalg.length(linalg.Vector2f32{mat[0, 0], mat[0, 1]})
+	scale_y = linalg.length(linalg.Vector2f32{mat[1, 0], mat[1, 1]})
+	//fmt.printfln("%f %f - %f rad, scale: %f %f", x, y, angle, scale_x, scale_y)
+	return
 }
 
 is_union :: proc($T: typeid) -> bool {
