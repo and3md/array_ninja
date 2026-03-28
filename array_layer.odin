@@ -387,6 +387,12 @@ layer_get_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: Persis
 	return {world_vec1.x, world_vec1.y, 0, 0}
 }
 
+layer_draw_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: PersistentId)
+{
+	rect := layer_get_element_global_bounding_box(layer, id)
+	rect_outline_draw(rect, YELLOW)
+}
+
 layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 	if layer.state == .Clean do return
 	child_level_matrix := make([dynamic]linalg.Matrix3f32)
