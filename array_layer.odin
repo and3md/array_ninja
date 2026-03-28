@@ -357,6 +357,36 @@ layer_get_element_global_scale :: proc(
 	return
 }
 
+layer_get_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> Rect {
+	element := &layer.arr[layer.persistent_ids[id]]
+	mat := &element.child_matrix
+
+	vec1 := linalg.Vector3f32{0, 0, 1}
+	world_vec1 := vec1 * mat^ 
+
+	if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
+		square := element.data_union.(Square)
+
+		vec2 := linalg.Vector3f32{square.w, 0, 1}
+		world_vec2 := vec2 * mat^ 
+
+		vec3 := linalg.Vector3f32{square.w, square.h, 1}
+		world_vec3 := vec3 * mat^ 
+
+		vec4 := linalg.Vector3f32{0, square.h, 1}
+		world_vec4 := vec4 * mat^ 
+
+		min_x := math.min(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
+		max_x := math.max(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
+		min_y := math.min(world_vec1.y, world_vec2.y, world_vec3.y, world_vec4.y)
+		max_y := math.max(world_vec1.y, world_vec2.y, world_vec3.y, world_vec4.y)
+
+		return {min_x, min_y, max_x - min_x, max_y - min_y}
+	}
+
+	return {world_vec1.x, world_vec1.y, 0 , 0}
+}
+
 layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 	if layer.state == .Clean do return
 	child_level_matrix := make([dynamic]linalg.Matrix3f32)
