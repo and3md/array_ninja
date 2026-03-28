@@ -39,6 +39,7 @@ Array layer is a "flat union hierachy" based on child_level as child flag
 ArrayLayer :: struct($T: typeid) {
 	arr:            [dynamic]ArrayElement(T),
 	persistent_ids: [dynamic]int,
+	state:          ArrayLayerState,
 }
 
 PersistentId :: distinct u32
