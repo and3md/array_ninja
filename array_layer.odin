@@ -387,6 +387,27 @@ layer_get_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: Persis
 	return {world_vec1.x, world_vec1.y, 0, 0}
 }
 
+layer_get_element_with_children_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> Rect {
+	parent_index := layer.persistent_ids[id]
+	parent: = &layer.arr[parent_index]
+	rect := layer_get_element_global_bounding_box(layer, id)
+
+	i := parent_index + 1
+	for i < len(layer.arr) {
+		element := &layer.arr[i]
+		if element.child_level <= parent.child_level {
+			break
+		}
+		fmt.printfln("rect przed: %v", rect);
+		fmt.printfln("rect do dodania: %v", layer_get_element_global_bounding_box(layer, element.id));
+		rect = rect_merge(rect, layer_get_element_global_bounding_box(layer, element.id))
+		fmt.printfln("rect po: %v", rect);
+		i += 1
+	}
+	return rect
+}
+
+
 layer_draw_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: PersistentId)
 {
 	rect := layer_get_element_global_bounding_box(layer, id)
