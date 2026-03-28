@@ -176,8 +176,19 @@ layer_delete_elements_range_by_indexes :: proc(
 /*
 Detach element with children
 */
-layer_detach_element :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> [dynamic]ArrayElement(T) {
+layer_detach_element :: proc(
+	layer: ^ArrayLayer($T),
+	id: PersistentId,
+) -> (
+	detached_elements: [dynamic]ArrayElement(T),
+) {
+	index := layer.persistent_ids[id]
+	last_index := layer_last_child_index(layer, index)
 
+	detached_elements = make([dynamic]ArrayElement(T), last_index - index + 1)
+	copy(detached_elements[:], layer.arr[index:last_index + 1])
+	layer_delete_elements_range_by_indexes(layer, index, last_index)
+	return detached_elements
 }
 
 /*
