@@ -353,7 +353,7 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 			matrix_for_new_child_level := child_level_matrix[element.child_level] * m
 			// transform always adds matrix for its child_level + 1
 			// every element gets matrix for his child level
-			if cast(int) element.child_level + 1 >= len(child_level_matrix) {
+			if cast(int)element.child_level + 1 >= len(child_level_matrix) {
 				append(&child_level_matrix, matrix_for_new_child_level)
 			} else {
 				child_level_matrix[element.child_level + 1] = matrix_for_new_child_level
