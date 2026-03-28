@@ -325,33 +325,17 @@ layer_get_element_by_index :: proc(layer: ^ArrayLayer($T), index: int) -> ^Array
 }
 
 layer_render :: proc(layer: ^ArrayLayer($T)) {
-	//child_level_matrix := make([dynamic]linalg.Matrix3f32)
+	child_level_matrix := make([dynamic]linalg.Matrix3f32)
+	defer delete(child_level_matrix)
 	// Identity Matrix in Odin = Matrix3f32(1.0)
-	//append(&child_level_matrix, linalg.Matrix3f32(1.0))
-	world_matrix := linalg.Matrix3f32(1.0)
-	last_child_level: ChildLevel = 0
+	// child level 0 has always identity matrix
+	append(&child_level_matrix, linalg.Matrix3f32(1.0))
 
 	for &element in layer.arr {
-		if element.child_level != last_child_level {
-			last_child_level = element.child_level
-		}
-
-		if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
-			square := element.data_union.(Square)
-			x := world_matrix[2, 0]
-			y := world_matrix[2, 1]
-
-			angle := math.atan2(world_matrix[0, 1], world_matrix[0, 0])
-
-			scale_x := linalg.length(linalg.Vector2f32{world_matrix[0, 0], world_matrix[0, 1]})
-			scale_y := linalg.length(linalg.Vector2f32{world_matrix[1, 0], world_matrix[1, 1]})
-
-			//fmt.printfln("%f %f - %f rad, scale: %f %f", x, y, angle, scale_x, scale_y)
-
-			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
-		}
+		// transform support
 		if reflect.union_variant_typeid(element.data_union) == typeid_of(ArrayTransform) {
 			transform := element.data_union.(ArrayTransform)
+
 			m := linalg.Matrix3f32(1.0)
 			// added origin
 			m[2, 0] -= transform.origin.x
@@ -366,7 +350,30 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 			m[2, 0] += transform.x
 			m[2, 1] += transform.y
 
-			world_matrix = world_matrix * m
+			matrix_for_new_child_level := child_level_matrix[element.child_level] * m
+			// transform always adds matrix for its child_level + 1
+			// every element gets matrix for his child level
+			if cast(int) element.child_level + 1 >= len(child_level_matrix) {
+				append(&child_level_matrix, matrix_for_new_child_level)
+			} else {
+				child_level_matrix[element.child_level + 1] = matrix_for_new_child_level
+			}
+		}
+
+		if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
+			square := element.data_union.(Square)
+			world_matrix:= &child_level_matrix[element.child_level]
+			x := world_matrix[2, 0]
+			y := world_matrix[2, 1]
+
+			angle := math.atan2(world_matrix[0, 1], world_matrix[0, 0])
+
+			scale_x := linalg.length(linalg.Vector2f32{world_matrix[0, 0], world_matrix[0, 1]})
+			scale_y := linalg.length(linalg.Vector2f32{world_matrix[1, 0], world_matrix[1, 1]})
+
+			//fmt.printfln("%f %f - %f rad, scale: %f %f", x, y, angle, scale_x, scale_y)
+
+			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
 		}
 	}
 }
