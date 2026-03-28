@@ -20,10 +20,16 @@ ArrayElementState :: enum byte {
 }
 
 ArrayElement :: struct($T: typeid) {
-	data_union:  T,
-	id:          PersistentId,
-	child_level: ChildLevel,
-	state:       ArrayElementState,
+	data_union:   T,
+	child_matrix: linalg.Matrix3f32, // matrix for this element, not parent
+	id:           PersistentId,
+	child_level:  ChildLevel,
+	state:        ArrayElementState,
+}
+
+ArrayLayerState :: enum byte {
+	Dirty,
+	Clean,
 }
 
 /*
@@ -324,7 +330,7 @@ layer_get_element_by_index :: proc(layer: ^ArrayLayer($T), index: int) -> ^Array
 	return &layer.arr[index]
 }
 
-layer_render :: proc(layer: ^ArrayLayer($T)) {
+layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 	child_level_matrix := make([dynamic]linalg.Matrix3f32)
 	defer delete(child_level_matrix)
 	// Identity Matrix in Odin = Matrix3f32(1.0)
@@ -350,21 +356,26 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 			m[2, 0] += transform.x
 			m[2, 1] += transform.y
 
-			matrix_for_new_child_level := child_level_matrix[element.child_level] * m
+			element.child_matrix = child_level_matrix[element.child_level] * m
 			// transform always adds matrix for its child_level + 1
 			// every element gets matrix for his child level
 			if cast(int)element.child_level + 1 >= len(child_level_matrix) {
-				append(&child_level_matrix, matrix_for_new_child_level)
+				append(&child_level_matrix, element.child_matrix)
 			} else {
-				child_level_matrix[element.child_level + 1] = matrix_for_new_child_level
+				child_level_matrix[element.child_level + 1] = element.child_matrix
 			}
+		} else {
+			element.child_matrix = child_level_matrix[element.child_level]
 		}
+	}
+}
+
+layer_render :: proc(layer: ^ArrayLayer($T)) {
+	for &element in layer.arr {
 
 		if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
 			square := element.data_union.(Square)
-			x, y, angle, scale_x, scale_y := decompose_matrix(
-				&child_level_matrix[element.child_level],
-			)
+			x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
 			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
 		}
 	}
