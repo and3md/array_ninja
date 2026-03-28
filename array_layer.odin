@@ -221,10 +221,33 @@ layer_get_parents_ids :: proc(
 }
 
 /*
-
+Checks all parents visibility to infer the final visibility of an element
 */
 layers_element_visible :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> bool {
-
+	index := layer.persistent_ids[id]
+	current_child_level := layer.arr[index].child_level
+	if layer.arr[index].state != .Visible {
+		return false
+	}
+	if index == 0 || current_child_level == 0 {
+		return layer.arr[index].state == .Visible
+	}
+	i := index - 1
+	for i > -1 {
+		element := &layer.arr[i]
+		if element.child_level < current_child_level {
+			// we found a parent of element
+			current_child_level = element.child_level
+			if element.state != .Visible {
+				return false
+			}
+			if element.child_level == 0 {
+				break
+			}
+		}
+		i -= 1
+	}
+	return true
 }
 
 /*
