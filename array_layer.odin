@@ -192,10 +192,32 @@ layer_detach_element :: proc(
 }
 
 /*
-Gets all parents of element
+Gets all parents ids of element with given id
 */
-layer_get_parents :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> [dynamic]ArrayElement(PersistentId) {
-
+layer_get_parents_ids :: proc(
+	layer: ^ArrayLayer($T),
+	id: PersistentId,
+) -> (
+	parents: [dynamic]PersistentId,
+) {
+	index := layer.persistent_ids[id]
+	current_child_level := layer.arr[index].child_level
+	if index == 0 || current_child_level == 0 {
+		return nil
+	}
+	i := index - 1
+	for i > -1 {
+		element := &layer.arr[i]
+		if element.child_level < current_child_level {
+			current_child_level = element.child_level
+			append(&parents, element.id)
+			if element.child_level == 0 {
+				break
+			}
+		}
+		i -= 1
+	}
+	return parents
 }
 
 /*
