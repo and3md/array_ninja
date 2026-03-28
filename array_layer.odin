@@ -67,6 +67,7 @@ layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), err: Error) {
 		free(new_layer)
 		new_layer = nil
 	}
+	new_layer.state = .Dirty
 
 	return new_layer, nil
 }
@@ -85,6 +86,7 @@ layer_add_element :: proc(
 	id: PersistentId,
 	err: Error,
 ) {
+	layer.state = .Dirty
 	append(&layer.arr, ArrayElement(T){id = 2, child_level = 1, data_union = element}) or_return
 	arr_index := len(layer.arr) - 1
 
@@ -167,6 +169,7 @@ layer_delete_elements_range_by_indexes :: proc(
 	layer: ^ArrayLayer($T),
 	start_index, end_index: int,
 ) {
+	layer.state = .Dirty
 	for i in 0 ..= end_index - start_index {
 		ordered_remove(&layer.arr, start_index)
 	}
@@ -332,6 +335,7 @@ layer_get_element_by_index :: proc(layer: ^ArrayLayer($T), index: int) -> ^Array
 }
 
 layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
+	if layer.state == .Clean do return
 	child_level_matrix := make([dynamic]linalg.Matrix3f32)
 	defer delete(child_level_matrix)
 	// Identity Matrix in Odin = Matrix3f32(1.0)
