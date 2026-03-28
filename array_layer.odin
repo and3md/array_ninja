@@ -362,19 +362,19 @@ layer_get_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: Persis
 	mat := &element.child_matrix
 
 	vec1 := linalg.Vector3f32{0, 0, 1}
-	world_vec1 := vec1 * mat^ 
+	world_vec1 := vec1 * mat^
 
 	if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
 		square := element.data_union.(Square)
 
 		vec2 := linalg.Vector3f32{square.w, 0, 1}
-		world_vec2 := vec2 * mat^ 
+		world_vec2 := vec2 * mat^
 
 		vec3 := linalg.Vector3f32{square.w, square.h, 1}
-		world_vec3 := vec3 * mat^ 
+		world_vec3 := vec3 * mat^
 
 		vec4 := linalg.Vector3f32{0, square.h, 1}
-		world_vec4 := vec4 * mat^ 
+		world_vec4 := vec4 * mat^
 
 		min_x := math.min(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
 		max_x := math.max(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
@@ -384,7 +384,7 @@ layer_get_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: Persis
 		return {min_x, min_y, max_x - min_x, max_y - min_y}
 	}
 
-	return {world_vec1.x, world_vec1.y, 0 , 0}
+	return {world_vec1.x, world_vec1.y, 0, 0}
 }
 
 layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
