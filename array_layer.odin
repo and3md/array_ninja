@@ -256,7 +256,7 @@ Checks all parents existence to infer the final existence of an element
 layers_element_exists :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> bool {
 	index := layer.persistent_ids[id]
 	current_child_level := layer.arr[index].child_level
-	if layer.arr[index].state == .Invisible_Nonexisting  {
+	if layer.arr[index].state == .Invisible_Nonexisting {
 		return false
 	}
 	if index == 0 || current_child_level == 0 {
