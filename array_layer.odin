@@ -251,10 +251,33 @@ layers_element_visible :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> bool
 }
 
 /*
-
+Checks all parents existence to infer the final existence of an element
 */
 layers_element_exists :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> bool {
-
+	index := layer.persistent_ids[id]
+	current_child_level := layer.arr[index].child_level
+	if layer.arr[index].state == .Invisible_Nonexisting  {
+		return false
+	}
+	if index == 0 || current_child_level == 0 {
+		return layer.arr[index].state == .Visible || layer.arr[index].state == .Invisible_Existing
+	}
+	i := index - 1
+	for i > -1 {
+		element := &layer.arr[i]
+		if element.child_level < current_child_level {
+			// we found a parent of element
+			current_child_level = element.child_level
+			if element.state == .Invisible_Nonexisting {
+				return false
+			}
+			if element.child_level == 0 {
+				break
+			}
+		}
+		i -= 1
+	}
+	return true
 }
 
 
