@@ -8,3 +8,5 @@ GREEN :: Color{0, 255, 0, 255}
 BLUE :: Color{0, 255, 0, 255}
 GRAY :: Color{128, 128, 128, 255}
 DARK_GRAY :: Color{64, 64, 64, 255}
+CYAN :: Color{0, 255, 255, 255}
+YELLOW :: Color{255, 255, 0, 255}
