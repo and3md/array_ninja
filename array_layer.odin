@@ -334,6 +334,29 @@ layer_get_element_by_index :: proc(layer: ^ArrayLayer($T), index: int) -> ^Array
 	return &layer.arr[index]
 }
 
+layer_get_element_global_pos :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> Vec2 {
+	mat := &layer.arr[layer.persistent_ids[id]].child_matrix
+	fmt.printfln("%#v", mat^)
+	return {mat[2, 0], mat[2, 1]}
+}
+
+layer_get_element_global_rotation_rad :: proc(layer: ^ArrayLayer($T), id: PersistentId) -> f32 {
+	mat := &layer.arr[layer.persistent_ids[id]].child_matrix
+	return math.atan2(mat[0, 1], mat[0, 0])
+}
+
+layer_get_element_global_scale :: proc(
+	layer: ^ArrayLayer($T),
+	id: PersistentId,
+) -> (
+	scale_x, scale_y: f32,
+) {
+	mat := &layer.arr[layer.persistent_ids[id]].child_matrix
+	scale_x = linalg.length(linalg.Vector2f32{mat[0, 0], mat[0, 1]})
+	scale_y = linalg.length(linalg.Vector2f32{mat[1, 0], mat[1, 1]})
+	return
+}
+
 layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 	if layer.state == .Clean do return
 	child_level_matrix := make([dynamic]linalg.Matrix3f32)
