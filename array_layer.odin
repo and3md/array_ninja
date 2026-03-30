@@ -62,6 +62,22 @@ Sprite :: struct {
 	tint: Color,
 }
 
+Animation :: struct {
+	frames:        []int,
+	frame_rate:    f32,
+	timer:         f32,
+	current_frame: int,
+	looped:        bool,
+}
+
+AnimatedSprite :: struct {
+	animation: Animation,
+	tex:       Texture,
+	tint:      Color,
+	frame_w:   int,
+	frame_h:   int,
+}
+
 layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), err: Error) {
 	if !intrinsics.type_is_union(T) {
 		return nil, MyError.Array_Layer_Data_Type_Must_Be_Union
