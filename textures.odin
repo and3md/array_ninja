@@ -18,3 +18,9 @@ tex_draw :: proc(tex: Texture, pos: Vec2, tint: Color = WHITE)
 {
     k2.draw_texture(tex, pos, tint)
 }
+
+// rotation - radians
+tex_draw_ex :: proc(tex: Texture, src: Rect, dst: Rect, rotation: f32, tint: Color = WHITE) 
+{
+	k2.draw_texture_ex(tex, src, dst, {0,0}, rotation, tint)
+}
