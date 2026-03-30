@@ -590,16 +590,34 @@ log_full_hierarchy :: proc(layer: ^ArrayLayer($T)) {
 			if reflect.union_variant_typeid(element.data_union) == typeid_of(Sprite) {
 				sprite := element.data_union.(Sprite)
 				fmt.printfln(
-					"%*s% 3d - %s - w: %d, h: %d ",
+					"%*s% 3d - %s - w: %d, h: %d  tint: %v",
 					element.child_level * 2,
 					"",
 					element.child_level,
 					"Sprite",
 					sprite.tex.width,
 					sprite.tex.height,
+					sprite.tint,
 				)
 			}
 		}
+
+		when intrinsics.type_is_variant_of(T, Square) {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
+				square := element.data_union.(Square)
+				fmt.printfln(
+					"%*s% 3d - %s - w: %f, h: %f color: %v",
+					element.child_level * 2,
+					"",
+					element.child_level,
+					"Square",
+					square.w,
+					square.h,
+					square.color,
+				)
+			}
+		}
+
 
 		// Global data for all elements
 		fmt.printfln(
