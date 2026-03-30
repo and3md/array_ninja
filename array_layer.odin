@@ -442,16 +442,16 @@ layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 			m[2, 0] -= transform.origin.x
 			m[2, 1] -= transform.origin.y
 
-			// {0,0,1} is axis of rotation
+			// {0,0,-1} is axis of rotation
 			m =
 				m *
-				linalg.matrix3_scale_f32({transform.scale, transform.scale, 1.0}) *
-				linalg.matrix3_rotate_f32(linalg.to_radians(transform.rotation), {0, 0, 1})
+				linalg.matrix3_rotate_f32(linalg.to_radians(transform.rotation), {0, 0, -1}) *
+				linalg.matrix3_scale_f32({transform.scale, transform.scale, 1.0})
 
-			m[2, 0] += transform.x
-			m[2, 1] += transform.y
+			m[2, 0] += transform.x + transform.origin.x
+			m[2, 1] += transform.y + transform.origin.y
 
-			element.child_matrix = child_level_matrix[element.child_level] * m
+			element.child_matrix = m * child_level_matrix[element.child_level]
 			// transform always adds matrix for its child_level + 1
 			// every element gets matrix for his child level
 			if cast(int)element.child_level + 1 >= len(child_level_matrix) {
@@ -461,6 +461,11 @@ layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 			}
 		} else {
 			element.child_matrix = child_level_matrix[element.child_level]
+			if cast(int)element.child_level + 1 >= len(child_level_matrix) {
+				append(&child_level_matrix, element.child_matrix)
+			} else {
+				child_level_matrix[element.child_level + 1] = element.child_matrix
+			}
 		}
 	}
 	layer.state = .Clean
