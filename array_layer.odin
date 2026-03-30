@@ -531,7 +531,7 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 	}
 }
 
-log_transform_hierarchy :: proc (layer: ^ArrayLayer($T)) {
+log_transform_hierarchy :: proc(layer: ^ArrayLayer($T)) {
 	fmt.printfln("------------------------------------------------------------------------")
 	fmt.printfln("Transform hierarchy log:")
 	for &element in layer.arr {
@@ -539,10 +539,78 @@ log_transform_hierarchy :: proc (layer: ^ArrayLayer($T)) {
 			if reflect.union_variant_typeid(element.data_union) == typeid_of(ArrayTransform) {
 				transform := element.data_union.(ArrayTransform)
 				x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
-				fmt.printfln("%*s% 3d - %s - %f, %f rot: %f , scale: %f", element.child_level * 2, "", element.child_level, "Transform", transform.x, transform.y, transform.rotation, transform.scale)
-				fmt.printfln("%*s    - Global: %f, %f rot: %f , scale: %f", element.child_level * 2, "", x, y, math.to_degrees(angle), scale_x)
+				fmt.printfln(
+					"%*s% 3d - %s - %f, %f rot: %f , scale: %f",
+					element.child_level * 2,
+					"",
+					element.child_level,
+					"Transform",
+					transform.x,
+					transform.y,
+					transform.rotation,
+					transform.scale,
+				)
+				fmt.printfln(
+					"%*s    - Global: %f, %f rot: %f , scale: %f",
+					element.child_level * 2,
+					"",
+					x,
+					y,
+					math.to_degrees(angle),
+					scale_x,
+				)
 			}
 		}
+	}
+	fmt.printfln("------------------------------------------------------------------------")
+}
+
+log_full_hierarchy :: proc(layer: ^ArrayLayer($T)) {
+	fmt.printfln("------------------------------------------------------------------------")
+	fmt.printfln("Full hierarchy log:")
+	for &element in layer.arr {
+		x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
+		when intrinsics.type_is_variant_of(T, ArrayTransform) {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(ArrayTransform) {
+				transform := element.data_union.(ArrayTransform)
+				fmt.printfln(
+					"%*s% 3d - %s - %f, %f rot: %f , scale: %f",
+					element.child_level * 2,
+					"",
+					element.child_level,
+					"Transform",
+					transform.x,
+					transform.y,
+					transform.rotation,
+					transform.scale,
+				)
+			}
+		}
+		when intrinsics.type_is_variant_of(T, Sprite) {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(Sprite) {
+				sprite := element.data_union.(Sprite)
+				fmt.printfln(
+					"%*s% 3d - %s - w: %d, h: %d ",
+					element.child_level * 2,
+					"",
+					element.child_level,
+					"Sprite",
+					sprite.tex.width,
+					sprite.tex.height,
+				)
+			}
+		}
+
+		// Global data for all elements
+		fmt.printfln(
+			"%*s    - Global: %f, %f rot: %f , scale: %f",
+			element.child_level * 2,
+			"",
+			x,
+			y,
+			math.to_degrees(angle),
+			scale_x,
+		)
 	}
 	fmt.printfln("------------------------------------------------------------------------")
 }
