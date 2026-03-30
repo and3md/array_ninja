@@ -5,6 +5,7 @@ import "core:fmt"
 import "core:math"
 import "core:math/linalg"
 import "core:reflect"
+import hm "core:container/handle_map"
 
 LAYER_DEFAULT_CAPACITY :: 1000
 
@@ -40,7 +41,11 @@ ArrayLayer :: struct($T: typeid) {
 	arr:            [dynamic]ArrayElement(T),
 	persistent_ids: [dynamic]int,
 	state:          ArrayLayerState,
+	animations: hm.Dynamic_Handle_Map(Animation, AnimationHandle)
 }
+
+Handle :: hm.Handle64
+AnimationHandle :: distinct Handle
 
 PersistentId :: distinct u32
 ChildLevel :: distinct u8
@@ -63,19 +68,20 @@ Sprite :: struct {
 }
 
 Animation :: struct {
-	frames:        []int,
-	frame_rate:    f32,
-	timer:         f32,
-	current_frame: int,
-	looped:        bool,
+	tex:        Texture,
+	frames:     []int,
+	frame_rate: f32,
+	frame_w:    int,
+	frame_h:    int,
 }
 
 AnimatedSprite :: struct {
-	animation: Animation,
-	tex:       Texture,
-	tint:      Color,
-	frame_w:   int,
-	frame_h:   int,
+	animation:     AnimationHandle,
+	tint:          Color,
+	timer:         f32,
+	current_frame: int,
+	looped:        bool,
+	finished:      bool,
 }
 
 layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), err: Error) {
