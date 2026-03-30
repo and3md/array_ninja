@@ -469,10 +469,32 @@ layer_update_transforms :: proc(layer: ^ArrayLayer($T)) {
 layer_render :: proc(layer: ^ArrayLayer($T)) {
 	for &element in layer.arr {
 
-		if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
-			square := element.data_union.(Square)
-			x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
-			rect_draw_ex(Rect{x, y, square.w * scale_x, square.h * scale_y}, angle, square.color)
+		// check user union type has type Sprite
+		when intrinsics.type_is_variant_of(T, Sprite) {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(Sprite) {
+				sprite := element.data_union.(Sprite)
+				x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
+				tex_draw_ex(
+					sprite.tex,
+					{0, 0, cast(f32)sprite.tex.width, cast(f32)sprite.tex.height},
+					Rect{x, y, cast(f32)sprite.tex.width * scale_x, cast(f32)sprite.tex.height * scale_y},
+					angle,
+					sprite.color,
+				)
+			}
+		}
+
+		when intrinsics.type_is_variant_of(T, Square) {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
+				square := element.data_union.(Square)
+				x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
+				rect_draw_ex(
+					Rect{x, y, square.w * scale_x, square.h * scale_y},
+					angle,
+					square.color,
+				)
+				continue
+			}
 		}
 	}
 }
