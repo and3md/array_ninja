@@ -618,7 +618,6 @@ log_full_hierarchy :: proc(layer: ^ArrayLayer($T)) {
 			}
 		}
 
-
 		// Global data for all elements
 		fmt.printfln(
 			"%*s    - Global: %f, %f rot: %f , scale: %f",
