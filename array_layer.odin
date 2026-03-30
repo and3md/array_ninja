@@ -479,7 +479,7 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 					{0, 0, cast(f32)sprite.tex.width, cast(f32)sprite.tex.height},
 					Rect{x, y, cast(f32)sprite.tex.width * scale_x, cast(f32)sprite.tex.height * scale_y},
 					angle,
-					sprite.color,
+					sprite.tint,
 				)
 			}
 		}
