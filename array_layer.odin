@@ -57,6 +57,11 @@ Square :: struct {
 	color: Color,
 }
 
+Sprite :: struct {
+	tex:  Texture,
+	tint: Color,
+}
+
 layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), err: Error) {
 	if !intrinsics.type_is_union(T) {
 		return nil, MyError.Array_Layer_Data_Type_Must_Be_Union
