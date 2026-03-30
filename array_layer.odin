@@ -531,6 +531,19 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 	}
 }
 
+log_transform_hierarchy :: proc (layer: ^ArrayLayer($T)) {
+	for &element in layer.arr {
+		when intrinsics.type_is_variant_of(T, ArrayTransform) {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(ArrayTransform) {
+				transform := element.data_union.(ArrayTransform)
+				x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
+				fmt.printfln("%*s%d - %s - %f, %f rot: %f , scale: %f", element.child_level * 2, "", element.child_level, "Transform", transform.x, transform.y, transform.rotation, transform.scale)
+				fmt.printfln("%*sGlobal: %f, %f rot: %f , scale: %f", element.child_level * 2, "", x, y, math.to_degrees(angle), scale_x)
+			}
+		}
+	}
+}
+
 decompose_matrix :: proc(mat: ^linalg.Matrix3f32) -> (x, y, angle, scale_x, scale_y: f32) {
 	x = mat[2, 0]
 	y = mat[2, 1]
