@@ -369,24 +369,26 @@ layer_get_element_global_bounding_box :: proc(layer: ^ArrayLayer($T), id: Persis
 	vec1 := linalg.Vector3f32{0, 0, 1}
 	world_vec1 := vec1 * mat^
 
-	if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
-		square := element.data_union.(Square)
+	when intrinsics.type_is_variant_of(T, Square) {
+		if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
+			square := element.data_union.(Square)
 
-		vec2 := linalg.Vector3f32{square.w, 0, 1}
-		world_vec2 := vec2 * mat^
+			vec2 := linalg.Vector3f32{square.w, 0, 1}
+			world_vec2 := vec2 * mat^
 
-		vec3 := linalg.Vector3f32{square.w, square.h, 1}
-		world_vec3 := vec3 * mat^
+			vec3 := linalg.Vector3f32{square.w, square.h, 1}
+			world_vec3 := vec3 * mat^
 
-		vec4 := linalg.Vector3f32{0, square.h, 1}
-		world_vec4 := vec4 * mat^
+			vec4 := linalg.Vector3f32{0, square.h, 1}
+			world_vec4 := vec4 * mat^
 
-		min_x := math.min(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
-		max_x := math.max(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
-		min_y := math.min(world_vec1.y, world_vec2.y, world_vec3.y, world_vec4.y)
-		max_y := math.max(world_vec1.y, world_vec2.y, world_vec3.y, world_vec4.y)
+			min_x := math.min(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
+			max_x := math.max(world_vec1.x, world_vec2.x, world_vec3.x, world_vec4.x)
+			min_y := math.min(world_vec1.y, world_vec2.y, world_vec3.y, world_vec4.y)
+			max_y := math.max(world_vec1.y, world_vec2.y, world_vec3.y, world_vec4.y)
 
-		return {min_x, min_y, max_x - min_x, max_y - min_y}
+			return {min_x, min_y, max_x - min_x, max_y - min_y}
+		}
 	}
 
 	return {world_vec1.x, world_vec1.y, 0, 0}
