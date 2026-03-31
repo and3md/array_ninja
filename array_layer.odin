@@ -33,6 +33,19 @@ ArrayLayerState :: enum byte {
 	Clean,
 }
 
+Handle :: hm.Handle64
+AnimationHandle :: distinct Handle
+
+Animation :: struct {
+	tex:        Texture,
+	frames:     []int,
+	frame_rate: f32,
+	frame_w:    int,
+	frame_h:    int,
+	handle: AnimationHandle,
+}
+
+
 /*
 Array layer is a "flat union hierachy" based on child_level as child flag
 
@@ -44,8 +57,6 @@ ArrayLayer :: struct($T: typeid) {
 	animations: hm.Dynamic_Handle_Map(Animation, AnimationHandle)
 }
 
-Handle :: hm.Handle64
-AnimationHandle :: distinct Handle
 
 PersistentId :: distinct u32
 ChildLevel :: distinct u8
@@ -65,14 +76,6 @@ Square :: struct {
 Sprite :: struct {
 	tex:  Texture,
 	tint: Color,
-}
-
-Animation :: struct {
-	tex:        Texture,
-	frames:     []int,
-	frame_rate: f32,
-	frame_w:    int,
-	frame_h:    int,
 }
 
 AnimatedSprite :: struct {
@@ -96,10 +99,13 @@ layer_create :: proc($T: typeid) -> (new_layer: ^ArrayLayer(T), err: Error) {
 	}
 	new_layer.state = .Dirty
 
+	hm.dynamic_init(&new_layer.animations, context.allocator)
+
 	return new_layer, nil
 }
 
 layer_free :: proc(layer: ^ArrayLayer($T)) {
+	hm.dynamic_destroy(&layer.animations)
 	delete(layer.arr)
 	delete(layer.persistent_ids)
 	free(layer)
