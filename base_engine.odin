@@ -30,3 +30,7 @@ engine_clear_screen :: proc(color: Color) {
 engine_present :: proc() {
 	k2.present()
 }
+
+engine_delta_time :: proc() -> f32 {
+	return k2.get_frame_time()
+}
