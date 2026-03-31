@@ -677,3 +677,25 @@ is_union :: proc($T: typeid) -> bool {
 	type_info := type_info_of(T)
 	return reflect.is_union(type_info)
 }
+
+add_animation :: proc(
+	layer: ^ArrayLayer($T),
+	tex: Texture,
+	frames: []int,
+	frame_w, frame_h: int,
+	frame_rate: f32 = 30,
+) -> (
+	anim_handle: AnimationHandle,
+) {
+	anim_handle = hm.dynamic_add(
+		&layer.animations,
+		Animation {
+			tex = tex,
+			frames = frames,
+			frame_rate = frame_rate,
+			frame_h = frame_h,
+			frame_w = frame_w,
+		},
+	)
+	return
+}
