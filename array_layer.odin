@@ -699,3 +699,19 @@ add_animation :: proc(
 	)
 	return
 }
+
+get_animation :: proc(
+	layer: ^ArrayLayer($T),
+	anim_handle: AnimationHandle,
+) -> (
+	anim: ^Animation,
+	err: Error,
+) {
+	ok: bool
+	anim, ok = hm.dynamic_get(&layer.animations, anim_handle)
+	if ok {
+		return anim, nil
+	} else {
+		return nil, .Animation_Not_Found
+	}
+}
