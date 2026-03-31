@@ -558,12 +558,13 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 				}
 				x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
 
+				frame_index := animation.frames[sprite.current_frame]
 				frames_per_row := animation.tex.width / animation.frame_w
-				full_rows := sprite.current_frame / frames_per_row
+				full_rows := frame_index / frames_per_row
 				tex_draw_ex(
 					animation.tex,
 					{
-						cast(f32)((sprite.current_frame - full_rows) * animation.frame_w),
+						cast(f32)((frame_index - full_rows) * animation.frame_w),
 						cast(f32)(full_rows * animation.frame_w),
 						cast(f32)animation.frame_w,
 						cast(f32)animation.frame_h,
