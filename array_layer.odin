@@ -751,3 +751,29 @@ get_animation :: proc(
 		return nil, .Animation_Not_Found
 	}
 }
+
+layer_update_animations :: proc(layer: ^ArrayLayer($T), elapsed_time: f32) {
+
+	when intrinsics.type_is_variant_of(T, AnimatedSprite) {
+		for &element in layer.arr {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(AnimatedSprite) {
+				sprite := &element.data_union.(AnimatedSprite)
+				animation, err := get_animation(layer, sprite.animation)
+				if err != nil {
+					continue
+				}
+
+				sprite.timer += elapsed_time
+				frame_time := 1 / animation.frame_rate
+				if sprite.timer > frame_time {
+					sprite.timer -= frame_time
+					if sprite.current_frame + 1 == len(animation.frames) {
+						sprite.current_frame = 0
+					} else {
+						sprite.current_frame += 1
+					}
+				}
+			}
+		}
+	}
+}
