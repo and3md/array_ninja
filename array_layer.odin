@@ -544,6 +544,42 @@ layer_render :: proc(layer: ^ArrayLayer($T)) {
 			}
 		}
 
+		when intrinsics.type_is_variant_of(T, AnimatedSprite) {
+			if reflect.union_variant_typeid(element.data_union) == typeid_of(AnimatedSprite) {
+				sprite := element.data_union.(AnimatedSprite)
+				animation, err := get_animation(layer, sprite.animation)
+				if err == .Animation_Not_Found {
+					fmt.printfln(
+						"No animation with handle %v in element id %d",
+						sprite.animation,
+						element.id,
+					)
+					continue
+				}
+				x, y, angle, scale_x, scale_y := decompose_matrix(&element.child_matrix)
+
+				frames_per_row := animation.tex.width / animation.frame_w
+				full_rows := sprite.current_frame / frames_per_row
+				tex_draw_ex(
+					animation.tex,
+					{
+						cast(f32)((sprite.current_frame - full_rows) * animation.frame_w),
+						cast(f32)(full_rows * animation.frame_w),
+						cast(f32)animation.frame_w,
+						cast(f32)animation.frame_h,
+					},
+					Rect {
+						x,
+						y,
+						cast(f32)animation.frame_w * scale_x,
+						cast(f32)animation.frame_w * scale_y,
+					},
+					angle,
+					sprite.tint,
+				)
+			}
+		}
+
 		when intrinsics.type_is_variant_of(T, Square) {
 			if reflect.union_variant_typeid(element.data_union) == typeid_of(Square) {
 				square := element.data_union.(Square)
