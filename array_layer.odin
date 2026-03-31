@@ -1,11 +1,11 @@
 package array_ninja
 
 import "base:intrinsics"
+import hm "core:container/handle_map"
 import "core:fmt"
 import "core:math"
 import "core:math/linalg"
 import "core:reflect"
-import hm "core:container/handle_map"
 
 LAYER_DEFAULT_CAPACITY :: 1000
 
@@ -42,7 +42,7 @@ Animation :: struct {
 	frame_rate: f32,
 	frame_w:    int,
 	frame_h:    int,
-	handle: AnimationHandle,
+	handle:     AnimationHandle,
 }
 
 
@@ -54,7 +54,7 @@ ArrayLayer :: struct($T: typeid) {
 	arr:            [dynamic]ArrayElement(T),
 	persistent_ids: [dynamic]int,
 	state:          ArrayLayerState,
-	animations: hm.Dynamic_Handle_Map(Animation, AnimationHandle)
+	animations:     hm.Dynamic_Handle_Map(Animation, AnimationHandle),
 }
 
 
